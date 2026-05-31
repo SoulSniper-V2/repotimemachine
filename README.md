@@ -1,16 +1,3 @@
-#!/usr/bin/env bash
-# RepoTimeMachine.ai — Cinematic documentaries for GitHub repos
-# 
-# Stack: Next.js 16 + React 19 + Tailwind CSS 4 + OpenRouter (LLM)
-#
-# Quick start:
-#   npm install
-#   cp .env.example .env.local   # add your OPENROUTER_API_KEY + GITHUB_TOKEN
-#   npm run dev                   # http://localhost:3000
-#
-# Deploy:
-#   vercel                        # auto-detects Next.js
-
 # RepoTimeMachine.ai
 
 Paste a GitHub repo URL and get a cinematic documentary about its history — not a code dump, not a README summary. A dramatic narrative covering the origin story, key turning points, core characters, distinct eras, and butterfly effect moments.
@@ -31,10 +18,10 @@ Paste a GitHub repo URL and get a cinematic documentary about its history — no
 - **Cache:** Local filesystem (`.cache/` directory)
 - **Deploy:** Vercel (zero-config Next.js)
 
-## Setup
+## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/repotimemachine.git
+git clone https://github.com/SoulSniper-V2/repotimemachine.git
 cd repotimemachine
 npm install
 ```
@@ -58,7 +45,7 @@ npm run start    # production server
 
 ```bash
 npm i -g vercel
-vercel prod
+vercel --prod
 ```
 
 Set env vars in Vercel dashboard:
@@ -76,7 +63,7 @@ app/
   [owner]/[repo]/page.tsx     # Dynamic route: repotimemachine.ai/facebook/react
   api/documentary/route.ts    # GitHub data → LLM → documentary JSON
   components/
-    home-documentary.tsx      # Input form + example buttons + streaming logic
+    home-documentary.tsx      # Input form + example buttons
     documentary-output.tsx    # Parsed documentary renderer (timeline, badges)
 lib/
   github-client.ts            # GitHub API client (10 parallel data sources)
