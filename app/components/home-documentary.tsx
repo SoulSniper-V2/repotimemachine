@@ -90,8 +90,6 @@ export default function HomeDocumentary({ initialInput, autoSubmit }: HomeDocume
     { label: 'Go', value: 'golang/go' },
     { label: 'Rust', value: 'rust-lang/rust' },
     { label: 'TypeScript', value: 'microsoft/TypeScript' },
-    { label: 'Django', value: 'django/django' },
-    { label: 'Vue', value: 'vuejs/vue' },
   ];
 
   return (
