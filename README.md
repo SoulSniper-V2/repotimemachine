@@ -1,75 +1,89 @@
-# RepoTimeMachine.ai
+<div align="center">
 
-Paste a GitHub repo URL and get a cinematic documentary about its history — not a code dump, not a README summary. A dramatic narrative covering the origin story, key turning points, core characters, distinct eras, and butterfly effect moments.
+![RepoTimeMachine](https://img.shields.io/badge/RepoTimeMachine-ai-ff6b00?style=for-the-badge&logo=github&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=vercel&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-## What it does
+**Paste a GitHub repo. Watch its history unfold.**
 
-- Paste any `owner/repo` or full GitHub URL
-- Fetches 10 data sources from the GitHub API (metadata, commits, contributors, releases, file tree, README, languages, code frequency, top PRs, top issues)
-- Synthesizes everything into a structured documentary via LLM
-- Renders with a neo-brutalist UI: date pill timelines, stat badges, character cards, era sections
-- Results cached locally for 24h (no repeat generation for same repo)
+Not commits. Not code. The *documentary*.
 
-## Stack
+[Live Demo](https://repotimemachine.ai) · [Report Bug](https://github.com/SoulSniper-V2/repotimemachine/issues) · [Request Feature](https://github.com/SoulSniper-V2/repotimemachine/issues)
 
-- **Frontend:** Next.js 16, React 19, Tailwind CSS 4
-- **LLM:** OpenRouter (default: `openrouter/owl-alpha`)
-- **Data:** GitHub REST API (authenticated, 5000 req/hr)
-- **Cache:** Local filesystem (`.cache/` directory)
-- **Deploy:** Vercel (zero-config Next.js)
+</div>
 
-## Quick Start
+---
 
-```bash
-git clone https://github.com/SoulSniper-V2/repotimemachine.git
-cd repotimemachine
-npm install
+## What is this?
+
+RepoTimeMachine.ai generates cinematic documentaries about GitHub repositories. Paste any `owner/repo` URL and get a structured narrative covering:
+
+- **⏳ The Genesis** — What problem existed, who sparked it, the initial backlash
+- **📈 Scale Today** — Stars, forks, real-world impact
+- **🔄 Turning Points** — Key moments that changed the project's trajectory, with date pills
+- **👥 Characters** — Core contributors, commit counts, first appearances
+- **🗺️ Eras** — Distinct phases of the project's lifetime
+- **🦋 Butterfly Effect** — One decision that cascaded into everything
+
+All generated from real GitHub data — commits, contributors, releases, PRs, issues — synthesized into punchy narrative beats by an LLM.
+
+## How it works
+
+```
+GitHub API (10 data sources)
+        ↓
+  Parallel fetch (metadata, commits, contributors,
+  releases, file tree, README, languages, code
+  frequency, top PRs, top issues)
+        ↓
+  Structured data → LLM (OpenRouter)
+        ↓
+  Documentary JSON → Rendered with
+  neo-brutalist UI components
 ```
 
-Create `.env.local`:
+Results are cached for 24 hours. Same repo = instant load.
 
-```env
-OPENROUTER_API_KEY=sk-or-v1-your-key-here
-OPENROUTER_MODEL=openrouter/owl-alpha
-GITHUB_TOKEN=ghp_your-github-token-here
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
+## Tech Stack
 
-```bash
-npm run dev      # local development
-npm run build    # production build
-npm run start    # production server
-```
-
-## Deploy to Vercel
-
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-Set env vars in Vercel dashboard:
-- `OPENROUTER_API_KEY`
-- `GITHUB_TOKEN`
-- `OPENROUTER_MODEL` = `openrouter/owl-alpha`
-- `NEXT_PUBLIC_APP_URL` = your production URL
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, Tailwind CSS 4 |
+| Fonts | Geist Sans + Geist Mono |
+| LLM | OpenRouter |
+| Data | GitHub REST API (authenticated) |
+| Cache | Local filesystem (24h TTL) |
+| Deploy | Vercel (serverless) |
 
 ## Project Structure
 
 ```
 app/
-  page.tsx                    # Home page with input + documentary output
-  layout.tsx                  # Root layout (Geist fonts, cream background)
-  [owner]/[repo]/page.tsx     # Dynamic route: repotimemachine.ai/facebook/react
-  api/documentary/route.ts    # GitHub data → LLM → documentary JSON
-  components/
-    home-documentary.tsx      # Input form + example buttons
-    documentary-output.tsx    # Parsed documentary renderer (timeline, badges)
+├── page.tsx                     # Landing page + input form
+├── layout.tsx                   # Root layout (fonts, cream bg)
+├── [owner]/[repo]/page.tsx      # Dynamic route → repotimemachine.ai/facebook/react
+├── api/documentary/route.ts     # GitHub fetch → LLM → documentary
+└── components/
+    ├── home-documentary.tsx     # Input, example buttons, generation flow
+    └── documentary-output.tsx   # Timeline, date pills, stat badges, era cards
 lib/
-  github-client.ts            # GitHub API client (10 parallel data sources)
-  documentary-prompt.ts       # LLM system prompt + user message builder
-  parse-github-repo.ts        # URL parser
+├── github-client.ts             # 10 parallel GitHub API calls
+├── documentary-prompt.ts        # LLM system prompt + user message template
+└── parse-github-repo.ts         # URL parser (owner/repo, full URL, etc.)
 ```
+
+## Features
+
+- **Neo-brutalist UI** — Thick borders, offset shadows, cream backgrounds, warm orange accents
+- **Documentary renderer** — Custom parser that turns LLM output into structured visual components
+- **URL routing** — `repotimemachine.ai/facebook/react` works as a direct link
+- **9 example repos** — Linux, React, Next.js, VS Code, Go, Rust, TypeScript, Django, Vue
+- **24h local cache** — No redundant API calls for the same repo
+- **Streaming-ready** — Client handles both streaming and non-streaming responses
 
 ## License
 
