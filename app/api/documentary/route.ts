@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DOCUMENTARY_SYSTEM_PROMPT, buildDocumentaryUserMessage, RepoDataForDocumentary } from "@/lib/documentary-prompt";
 import { getRepoMeta, getCommits, getContributors, getReleases, getFileTree, getReadme, getLanguages, getCodeFrequency, getTopPullRequests, getTopIssues } from "@/lib/github-client";
-import { promises as fs } from "fs";
-import path from "path";
+import { kv } from "@vercel/kv";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -23,36 +22,8 @@ function resolveLlm(): LlmTarget | { error: string } {
   return { error: "No LLM API key. Set OPENROUTER_API_KEY, OPENAI_API_KEY, or XAI_API_KEY." };
 }
 
-// Local file-based cache
-const CACHE_DIR = path.join(process.cwd(), ".cache");
-
-async function getCache(owner: string, repo: string): Promise<string | null> {
-  try {
-    const cacheFile = path.join(CACHE_DIR, `${owner}__${repo}.json`);
-    const raw = await fs.readFile(cacheFile, "utf-8");
-    const entry = JSON.parse(raw);
-    const ageMs = Date.now() - new Date(entry.cached_at).getTime();
-    // Cache valid for 24 hours
-    if (ageMs < 24 * 60 * 60 * 1000) {
-      return entry.documentary;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-async function setCache(owner: string, repo: string, doc: string): Promise<void> {
-  try {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-    const cacheFile = path.join(CACHE_DIR, `${owner}__${repo}.json`);
-    await fs.writeFile(cacheFile, JSON.stringify({
-      owner,
-      repo,
-      documentary: doc,
-      cached_at: new Date().toISOString(),
-    }));
-  } catch { /* non-fatal */ }
+function cacheKey(owner: string, repo: string): string {
+  return `doc:${owner}/${repo}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -65,8 +36,8 @@ export async function POST(req: NextRequest) {
   const llm = resolveLlm();
   if ("error" in llm) return NextResponse.json({ error: llm.error }, { status: 500 });
 
-  // Check cache
-  const cached = await getCache(owner, repo);
+  // Check KV cache
+  const cached = await kv.get(cacheKey(owner, repo)) as string | null;
   if (cached) return NextResponse.json({ documentary: cached, fromCache: true });
 
   try {
@@ -118,7 +89,9 @@ export async function POST(req: NextRequest) {
 
     const json = await res.json();
     const documentary = json.choices?.[0]?.message?.content ?? "Failed to generate.";
-    await setCache(owner, repo, documentary);
+
+    // Cache for 24h
+    await kv.set(cacheKey(owner, repo), documentary, { ex: 86400 });
 
     return NextResponse.json({ documentary, fromCache: false });
   } catch (err: any) {
